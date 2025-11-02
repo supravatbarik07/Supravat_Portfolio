@@ -252,8 +252,9 @@ button:hover ~ .cursor-outline,
 .exp-list li {
   margin: 12px 0;
   display: flex;
-  align-items: center;
-  font-size: 1.05rem;
+  align-items: flex-start; /* ✅ Align text block properly */
+  gap: 10px; /* ✅ Space between icon & text */
+  font-size: 0.9rem;
   line-height: 1.6;
   transition: all 0.3s ease;
 }
@@ -265,12 +266,11 @@ button:hover ~ .cursor-outline,
 }
 
 .exp-icon {
-  margin-right: 12px;
   font-size: 1.2rem;
   color: var(--neon);
   filter: drop-shadow(0 0 6px var(--neon));
+  margin-top: 4px; /* ✅ Align icon nicely with text */
 }
-
 /* Entry animation */
 @keyframes fadeInUp {
   0% {
