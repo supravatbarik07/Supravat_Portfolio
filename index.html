@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Supravat Barik — Portfolio</title>
   <link rel="stylesheet" href="style.css?v=2">
+  <!-- Three.js for 3D background animation (small CDN bundle) -->
+  <script defer src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
   <script defer src="script.js"></script>
 </head>
 <body class="dark">
@@ -15,6 +17,9 @@
     <div class="glow-orb orb-1"></div>
     <div class="glow-orb orb-2"></div>
   </div>
+
+  <!-- 3D animated background: will insert a WebGL canvas here via Three.js -->
+  <div id="bg3d-container" aria-hidden="true"></div>
 
   <header class="site-header">
   <div class="brand">

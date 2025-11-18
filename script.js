@@ -200,3 +200,90 @@ function updateExperience() {
 
 updateExperience();
 setInterval(updateExperience, 1000 * 60 * 60 * 24);
+
+// ---------- 3D BACKGROUND (three.js particles) ----------
+function init3DBackground() {
+  // exit early if Three.js not present
+  if (typeof THREE === 'undefined' || !THREE.WebGLRenderer) return;
+
+  const container = document.getElementById('bg3d-container');
+  if (!container) return;
+
+  // Create renderer
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.domElement.style.display = 'block';
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 4000);
+  camera.position.z = 600;
+
+  // Points geometry
+  const count = Math.floor(window.innerWidth * 0.12) + 400; // scale with width
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const r = (Math.random() - 0.5) * 1600; // spread
+    const s = (Math.random() - 0.5) * 900;
+    const t = (Math.random() - 0.5) * 600;
+    positions[i * 3] = r;
+    positions[i * 3 + 1] = s;
+    positions[i * 3 + 2] = t;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const material = new THREE.PointsMaterial({
+    color: 0x00ffcc,
+    size: 3.0,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending,
+    depthTest: false
+  });
+
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
+
+  // Subtle parallax / motion based on mouse
+  let mouseX = 0; let mouseY = 0;
+  const onMove = (e) => {
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.002;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.002;
+  };
+  window.addEventListener('mousemove', onMove, { passive: true });
+
+  // Resize handler
+  const onResize = () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  };
+  window.addEventListener('resize', onResize);
+
+  // animate
+  const clock = new THREE.Clock();
+  function animate() {
+    const t = clock.getElapsedTime();
+    points.rotation.y = t * 0.02 + mouseX;
+    points.rotation.x = Math.sin(t * 0.06) * 0.03 + mouseY;
+    points.rotation.z = Math.cos(t * 0.04) * 0.03;
+
+    // slow pulsate of particle size
+    material.size = 2.2 + Math.sin(t * 0.9) * 0.45;
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// Initialize 3D background after DOM & three.js loaded
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', init3DBackground);
+} else {
+  init3DBackground();
+}
